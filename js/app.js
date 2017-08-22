@@ -67,160 +67,6 @@ $(function() {
 		$el.addClass('visible');
 	}, 1000);
 })
-//ResetForm validation
-$(function() {
-	if (!$('#reset-form').length) {
-        return false;
-    }
-
-    var resetValidationSettings = {
-	    rules: {
-	        email1: {
-	            required: true,
-	            email: true
-	        }
-	    },
-	    messages: {
-	        email1: {
-	            required: "Please enter email address",
-	            email: "Please enter a valid email address"
-	        }
-	    },
-	    invalidHandler: function() {
-			animate({
-				name: 'shake',
-				selector: '.auth-container > .card'
-			});
-		}
-	}
-
-	$.extend(resetValidationSettings, config.validations);
-
-    $('#reset-form').validate(resetValidationSettings);
-})
-//LoginForm validation
-$(function() {
-	if (!$('#login-form').length) {
-        return false;
-    }
-
-    var loginValidationSettings = {
-	    rules: {
-	        username: {
-	            required: true,
-	            email: true
-	        },
-	        password: "required",
-	        agree: "required"
-	    },
-	    messages: {
-	        username: {
-	            required: "Please enter username",
-	            email: "Please enter a valid email address"
-	        },
-	        password:  "Please enter password",
-	        agree: "Please accept our policy"
-	    },
-	    invalidHandler: function() {
-			animate({
-				name: 'shake',
-				selector: '.auth-container > .card'
-			});
-		}
-	}
-
-	$.extend(loginValidationSettings, config.validations);
-
-    $('#login-form').validate(loginValidationSettings);
-})
-//SignupForm validation
-$(function() {
-	if (!$('#signup-form').length) {
-        return false;
-    }
-
-    var signupValidationSettings = {
-	    rules: {
-	    	firstname: {
-	    		required: true,
-	    	},
-	    	lastname: {
-	    		required: true,
-	    	},
-	        email: {
-	            required: true,
-	            email: true
-	        },
-	        password: {
-				required: true,
-				minlength: 8
-	        },
-	        retype_password: {
-				required: true,
-				minlength: 8,
-				equalTo: "#password"
-			},
-			agree: {
-				required: true,
-			}
-	    },
-	    groups: {
-	    	name: "firstname lastname",
-			pass: "password retype_password",
-		},
-		errorPlacement: function(error, element) {
-			if (
-				element.attr("name") == "firstname" || 
-				element.attr("name") == "lastname" 
-			) {
-				error.insertAfter($("#lastname").closest('.row'));
-				element.parents("div.form-group")
-				.addClass('has-error');
-			} 
-			else if (
-				element.attr("name") == "password" || 
-				element.attr("name") == "retype_password" 
-			) {
-				error.insertAfter($("#retype_password").closest('.row'));
-				element.parents("div.form-group")
-				.addClass('has-error');
-			}
-			else if (element.attr("name") == "agree") {
-				error.insertAfter("#agree-text");
-			}
-			else {
-				error.insertAfter(element);
-			}
-		},
-	    messages: {
-	    	firstname: "Please enter firstname and lastname",
-	    	lastname: "Please enter firstname and lastname",
-	        email: {
-	            required: "Please enter email",
-	            email: "Please enter a valid email address"
-	        },
-	        password: {
-	        	required: "Please enter password fields.",
-	        	minlength: "Passwords should be at least 8 characters."
-	        },
-	        retype_password: {
-	        	required: "Please enter password fields.",
-	        	minlength: "Passwords should be at least 8 characters."
-	        },
-	        agree: "Please accept our policy"
-	    },
-	    invalidHandler: function() {
-			animate({
-				name: 'shake',
-				selector: '.auth-container > .card'
-			});
-		}
-	}
-
-	$.extend(signupValidationSettings, config.validations);
-
-    $('#signup-form').validate(signupValidationSettings);
-});
 /***********************************************
 *        Animation Settings
 ***********************************************/
@@ -310,292 +156,218 @@ function setSameHeights($container) {
 	});
 }
 
+//LoginForm validation
 $(function() {
-
-    if (!$('#dashboard-visits-chart').length) {
+	if (!$('#login-form').length) {
         return false;
     }
 
-    // drawing visits chart
-    drawVisitsChart();
-
-    var el = null;
-    var item = 'visits';
-
-    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-       
-       el = e.target;
-       item = $(el).attr('href').replace('#', '');
-       switchHistoryCharts(item);
-       
-    });
-
-    $(document).on("themechange", function(){
-        switchHistoryCharts(item);
-    });
-
-    function switchHistoryCharts(item){
-        var chartSelector = "#dashboard-" + item + "-chart";
-
-        if ($(chartSelector).has('svg').length) {
-            $(chartSelector).empty();
-        }
-
-        switch(item){
-            case 'visits':
-                drawVisitsChart();
-                break;
-             case 'downloads':
-                drawDownloadsChart();
-                break;
-        }
-    }
-
-    function drawVisitsChart(){
-        var dataVisits = [
-            { x: '2015-09-01', y: 70},
-            { x: '2015-09-02', y: 75 },
-            { x: '2015-09-03', y: 50},
-            { x: '2015-09-04', y: 75 },
-            { x: '2015-09-05', y: 50 },
-            { x: '2015-09-06', y: 75 },
-            { x: '2015-09-07', y: 86 } 
-        ];
-
-
-        Morris.Line({
-            element: 'dashboard-visits-chart',
-            data: dataVisits,
-            xkey: 'x',
-            ykeys: ['y'],
-            ymin: 'auto 40',
-            labels: ['Visits'],
-            xLabels: "day",
-            hideHover: 'auto',
-            yLabelFormat: function (y) {
-                // Only integers
-                if (y === parseInt(y, 10)) {
-                    return y;
-                }
-                else {
-                    return '';
-                }
-            },
-            resize: true,
-            lineColors: [
-                config.chart.colorSecondary.toString(),
-            ],
-            pointFillColors: [
-                 config.chart.colorPrimary.toString(),
-            ]
-        });
-    }
-
-    function drawDownloadsChart(){
-
-        var dataDownloads = [
-            { 
-                year: '2006',
-                downloads: 1300
-            },
-            { 
-                year: '2007', 
-                downloads: 1526
-            },
-            { 
-                year: '2008', 
-                downloads: 2000
-            },
-            { 
-                year: '2009', 
-                downloads: 1800
-            },
-            { 
-                year: '2010', 
-                downloads: 1650
-            },    
-            { 
-                year: '2011', 
-                downloads: 620
-            },
-            { 
-                year: '2012', 
-                downloads: 1000
-            },
-            { 
-                year: '2013', 
-                downloads: 1896
-            },
-            { 
-                year: '2014', 
-                downloads: 850
-            },
-            { 
-                year: '2015', 
-                downloads: 1500
-            }  
-        ];
-
-
-        Morris.Bar({
-            element: 'dashboard-downloads-chart',
-            data: dataDownloads,
-            xkey: 'year',
-            ykeys: ['downloads'],
-            labels: ['Downloads'],
-            hideHover: 'auto',
-            resize: true,
-            barColors: [
-                config.chart.colorPrimary.toString(),
-                tinycolor(config.chart.colorPrimary.toString()).darken(10).toString()
-            ],
-        });
-    }
-});
-
-
-
-
-$(function() {
-	
-
-	function drawDashboardItemsListSparklines(){
-		$(".dashboard-page .items .sparkline").each(function() {
-			var type = $(this).data('type');
-
-			// There is predefined data
-			if ($(this).data('data')) {
-				var data = $(this).data('data').split(',').map(function(item) {
-					if (item.indexOf(":") > 0) {
-						return item.split(":");
-					}
-					else {
-						return item;
-					}
-				});
-			}
-			// Generate random data
-			else {
-				var data = [];
-				for (var i = 0; i < 17; i++) {
-					data.push(Math.round(100 * Math.random()));
-				}
-			}
-
-
-			$(this).sparkline(data, {
-				barColor: config.chart.colorPrimary.toString(),
-				height: $(this).height(),
-				type: type
+    var loginValidationSettings = {
+	    rules: {
+	        username: {
+	            required: true,
+	            email: true
+	        },
+	        password: "required",
+	        agree: "required"
+	    },
+	    messages: {
+	        username: {
+	            required: "Please enter username",
+	            email: "Please enter a valid email address"
+	        },
+	        password:  "Please enter password",
+	        agree: "Please accept our policy"
+	    },
+	    invalidHandler: function() {
+			animate({
+				name: 'shake',
+				selector: '.auth-container > .card'
 			});
-		});
+		}
 	}
 
-	drawDashboardItemsListSparklines();
+	$.extend(loginValidationSettings, config.validations);
 
-	$(document).on("themechange", function(){
-        drawDashboardItemsListSparklines();
-    });
-});
-$(function() {
-
-    var $dashboardSalesBreakdownChart = $('#dashboard-sales-breakdown-chart');
-
-    if (!$dashboardSalesBreakdownChart.length) {
-        return false;
-    } 
-
-    function drawSalesChart(){
-
-    $dashboardSalesBreakdownChart.empty();
-
-        Morris.Donut({
-            element: 'dashboard-sales-breakdown-chart',
-            data: [{ label: "Download Sales", value: 12 },
-                { label: "In-Store Sales", value: 30 },
-                { label: "Mail-Order Sales", value: 20 } ],
-            resize: true,
-            colors: [
-                tinycolor(config.chart.colorPrimary.toString()).lighten(10).toString(),
-                tinycolor(config.chart.colorPrimary.toString()).darken(8).toString(),
-                config.chart.colorPrimary.toString()
-            ],
-        });
-
-        var $sameheightContainer = $dashboardSalesBreakdownChart.closest(".sameheight-container");
-
-        setSameHeights($sameheightContainer);
-    }
-
-    drawSalesChart();
-
-    $(document).on("themechange", function(){
-       drawSalesChart();
-    });
-    
+    $('#login-form').validate(loginValidationSettings);
 })
+//ResetForm validation
 $(function() {
-
-    var $dashboardSalesMap = $('#dashboard-sales-map');
-
-    if (!$dashboardSalesMap.length) {
+	if (!$('#reset-form').length) {
         return false;
     }
 
-    function drawSalesMap() {
+    var resetValidationSettings = {
+	    rules: {
+	        email1: {
+	            required: true,
+	            email: true
+	        }
+	    },
+	    messages: {
+	        email1: {
+	            required: "Please enter email address",
+	            email: "Please enter a valid email address"
+	        }
+	    },
+	    invalidHandler: function() {
+			animate({
+				name: 'shake',
+				selector: '.auth-container > .card'
+			});
+		}
+	}
 
-        $dashboardSalesMap.empty();
+	$.extend(resetValidationSettings, config.validations);
 
-        var color = config.chart.colorPrimary.toHexString();
-        var darkColor = tinycolor(config.chart.colorPrimary.toString()).darken(40).toHexString();
-        var selectedColor = tinycolor(config.chart.colorPrimary.toString()).darken(10).toHexString();
-
-        var sales_data = {
-            us: 2000,
-            ru: 2000, 
-            gb: 10000,
-            fr: 10000,
-            de: 10000,
-            cn: 10000,
-            in: 10000,
-            sa: 10000,
-            ca: 10000,
-            br: 5000,
-            au: 5000
-        };
-
-        $dashboardSalesMap.vectorMap({
-            map: 'world_en',
-            backgroundColor: 'transparent',
-            color: '#E5E3E5',
-            hoverOpacity: 0.7,
-            selectedColor: selectedColor,
-            enableZoom: true,
-            showTooltip: true,
-            values: sales_data,
-            scaleColors: [ color, darkColor],
-            normalizeFunction: 'linear'
-        });
+    $('#reset-form').validate(resetValidationSettings);
+})
+//SignupForm validation
+$(function() {
+	if (!$('#signup-form').length) {
+        return false;
     }
 
-    drawSalesMap();
+    var signupValidationSettings = {
+	    rules: {
+	    	firstname: {
+	    		required: true,
+	    	},
+	    	lastname: {
+	    		required: true,
+	    	},
+	        email: {
+	            required: true,
+	            email: true
+	        },
+	        password: {
+				required: true,
+				minlength: 8
+	        },
+	        retype_password: {
+				required: true,
+				minlength: 8,
+				equalTo: "#password"
+			},
+			agree: {
+				required: true,
+			}
+	    },
+	    groups: {
+	    	name: "firstname lastname",
+			pass: "password retype_password",
+		},
+		errorPlacement: function(error, element) {
+			if (
+				element.attr("name") == "firstname" || 
+				element.attr("name") == "lastname" 
+			) {
+				error.insertAfter($("#lastname").closest('.row'));
+				element.parents("div.form-group")
+				.addClass('has-error');
+			} 
+			else if (
+				element.attr("name") == "password" || 
+				element.attr("name") == "retype_password" 
+			) {
+				error.insertAfter($("#retype_password").closest('.row'));
+				element.parents("div.form-group")
+				.addClass('has-error');
+			}
+			else if (element.attr("name") == "agree") {
+				error.insertAfter("#agree-text");
+			}
+			else {
+				error.insertAfter(element);
+			}
+		},
+	    messages: {
+	    	firstname: "Please enter firstname and lastname",
+	    	lastname: "Please enter firstname and lastname",
+	        email: {
+	            required: "Please enter email",
+	            email: "Please enter a valid email address"
+	        },
+	        password: {
+	        	required: "Please enter password fields.",
+	        	minlength: "Passwords should be at least 8 characters."
+	        },
+	        retype_password: {
+	        	required: "Please enter password fields.",
+	        	minlength: "Passwords should be at least 8 characters."
+	        },
+	        agree: "Please accept our policy"
+	    },
+	    invalidHandler: function() {
+			animate({
+				name: 'shake',
+				selector: '.auth-container > .card'
+			});
+		}
+	}
 
-    $(document).on("themechange", function(){
-       drawSalesMap();
-    });
+	$.extend(signupValidationSettings, config.validations);
+
+    $('#signup-form').validate(signupValidationSettings);
 });
 $(function() {
 
-	$('.actions-list > li').on('click', '.check', function(e){
-		e.preventDefault();
+	$(".wyswyg").each(function() {
 
-		$(this).parents('.tasks-item')
-		.find('.checkbox')
-		.prop("checked",  true);
+		var $toolbar = $(this).find(".toolbar");
+		var $editor = $(this).find(".editor");
 
-		removeActionList();
+
+		var editor = new Quill($editor.get(0), {
+			theme: 'snow'
+		});
+
+		editor.addModule('toolbar', {
+			container: $toolbar.get(0)     // Selector for toolbar container
+		});
+
+
+
+	});
+	
+});
+$(function () {
+
+	$('#sidebar-menu, #customize-menu').metisMenu({
+		activeClass: 'open'
 	});
 
+
+	$('#sidebar-collapse-btn').on('click', function(event){
+		event.preventDefault();
+		
+		$("#app").toggleClass("sidebar-open");
+	});
+
+	$("#sidebar-overlay").on('click', function() {
+		$("#app").removeClass("sidebar-open");
+	});
+
+	if ($.browser.mobile) {
+		var $appContainer = $('#app ');
+		var $mobileHandle = $('#sidebar-mobile-menu-handle ');
+
+		$mobileHandle.swipe({
+			swipeLeft: function() {
+				if($appContainer.hasClass("sidebar-open")) {
+					$appContainer.removeClass("sidebar-open");	
+				}
+			},
+			swipeRight: function() {
+				if(!$appContainer.hasClass("sidebar-open")) {
+					$appContainer.addClass("sidebar-open");
+				}
+			},
+			// excludedElements: "button, input, select, textarea, .noSwipe, table", 
+			triggerOnTouchEnd: false
+		});
+	}
+	
 });
 //Flot Bar Chart
 $(function() {
@@ -1052,19 +824,292 @@ $(function() {
         drawMorrisCharts();
     });
 });
-//LoginForm validation
 $(function() {
-	if (!$('.form-control').length) {
+
+    if (!$('#dashboard-visits-chart').length) {
         return false;
     }
 
-    $('.form-control').focus(function() {
-		$(this).siblings('.input-group-addon').addClass('focus');
+    // drawing visits chart
+    drawVisitsChart();
+
+    var el = null;
+    var item = 'visits';
+
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+
+       el = e.target;
+       item = $(el).attr('href').replace('#', '');
+       switchHistoryCharts(item);
+
+    });
+
+    $(document).on("themechange", function(){
+        switchHistoryCharts(item);
+    });
+
+    function switchHistoryCharts(item){
+        var chartSelector = "#dashboard-" + item + "-chart";
+
+        if ($(chartSelector).has('svg').length) {
+            $(chartSelector).empty();
+        }
+
+        switch(item){
+            case 'visits':
+                drawVisitsChart();
+                break;
+             case 'downloads':
+                drawDownloadsChart();
+                break;
+        }
+    }
+
+    function drawVisitsChart(){
+        var dataVisits = [
+            { x: '2015-09-01', y: 70},
+            { x: '2015-09-02', y: 75 },
+            { x: '2015-09-03', y: 50},
+            { x: '2015-09-04', y: 75 },
+            { x: '2015-09-05', y: 50 },
+            { x: '2015-09-06', y: 75 },
+            { x: '2015-09-07', y: 86 }
+        ];
+
+
+        Morris.Line({
+            element: 'dashboard-visits-chart',
+            data: dataVisits,
+            xkey: 'x',
+            ykeys: ['y'],
+            ymin: 'auto 40',
+            labels: ['Visits'],
+            xLabels: "day",
+            hideHover: 'auto',
+            yLabelFormat: function (y) {
+                // Only integers
+                if (y === parseInt(y, 10)) {
+                    return y;
+                }
+                else {
+                    return '';
+                }
+            },
+            resize: true,
+            lineColors: [
+                config.chart.colorSecondary.toString(),
+            ],
+            pointFillColors: [
+                 config.chart.colorPrimary.toString(),
+            ]
+        });
+    }
+
+    function drawDownloadsChart(){
+
+        var dataDownloads = [
+            {
+                year: '2006',
+                downloads: 1300
+            },
+            {
+                year: '2007',
+                downloads: 1526
+            },
+            {
+                year: '2008',
+                downloads: 2000
+            },
+            {
+                year: '2009',
+                downloads: 1800
+            },
+            {
+                year: '2010',
+                downloads: 1650
+            },
+            {
+                year: '2011',
+                downloads: 620
+            },
+            {
+                year: '2012',
+                downloads: 1000
+            },
+            {
+                year: '2013',
+                downloads: 1896
+            },
+            {
+                year: '2014',
+                downloads: 850
+            },
+            {
+                year: '2015',
+                downloads: 1500
+            }
+        ];
+
+
+        Morris.Bar({
+            element: 'dashboard-downloads-chart',
+            data: dataDownloads,
+            xkey: 'year',
+            ykeys: ['downloads'],
+            labels: ['Downloads'],
+            hideHover: 'auto',
+            resize: true,
+            barColors: [
+                config.chart.colorPrimary.toString(),
+                tinycolor(config.chart.colorPrimary.toString()).darken(10).toString()
+            ],
+        });
+    }
+});
+
+
+
+
+$(function() {
+
+    var $dashboardSalesBreakdownChart = $('#dashboard-sales-breakdown-chart');
+
+    if (!$dashboardSalesBreakdownChart.length) {
+        return false;
+    } 
+
+    function drawSalesChart(){
+
+    $dashboardSalesBreakdownChart.empty();
+
+        Morris.Donut({
+            element: 'dashboard-sales-breakdown-chart',
+            data: [{ label: "Download Sales", value: 12 },
+                { label: "In-Store Sales", value: 30 },
+                { label: "Mail-Order Sales", value: 20 } ],
+            resize: true,
+            colors: [
+                tinycolor(config.chart.colorPrimary.toString()).lighten(10).toString(),
+                tinycolor(config.chart.colorPrimary.toString()).darken(8).toString(),
+                config.chart.colorPrimary.toString()
+            ],
+        });
+
+        var $sameheightContainer = $dashboardSalesBreakdownChart.closest(".sameheight-container");
+
+        setSameHeights($sameheightContainer);
+    }
+
+    drawSalesChart();
+
+    $(document).on("themechange", function(){
+       drawSalesChart();
+    });
+    
+})
+$(function() {
+	
+
+	function drawDashboardItemsListSparklines(){
+		$(".dashboard-page .items .sparkline").each(function() {
+			var type = $(this).data('type');
+
+			// There is predefined data
+			if ($(this).data('data')) {
+				var data = $(this).data('data').split(',').map(function(item) {
+					if (item.indexOf(":") > 0) {
+						return item.split(":");
+					}
+					else {
+						return item;
+					}
+				});
+			}
+			// Generate random data
+			else {
+				var data = [];
+				for (var i = 0; i < 17; i++) {
+					data.push(Math.round(100 * Math.random()));
+				}
+			}
+
+
+			$(this).sparkline(data, {
+				barColor: config.chart.colorPrimary.toString(),
+				height: $(this).height(),
+				type: type
+			});
+		});
+	}
+
+	drawDashboardItemsListSparklines();
+
+	$(document).on("themechange", function(){
+        drawDashboardItemsListSparklines();
+    });
+});
+$(function() {
+
+    var $dashboardSalesMap = $('#dashboard-sales-map');
+
+    if (!$dashboardSalesMap.length) {
+        return false;
+    }
+
+    function drawSalesMap() {
+
+        $dashboardSalesMap.empty();
+
+        var color = config.chart.colorPrimary.toHexString();
+        var darkColor = tinycolor(config.chart.colorPrimary.toString()).darken(40).toHexString();
+        var selectedColor = tinycolor(config.chart.colorPrimary.toString()).darken(10).toHexString();
+
+        var sales_data = {
+            us: 2000,
+            ru: 2000, 
+            gb: 10000,
+            fr: 10000,
+            de: 10000,
+            cn: 10000,
+            in: 10000,
+            sa: 10000,
+            ca: 10000,
+            br: 5000,
+            au: 5000
+        };
+
+        $dashboardSalesMap.vectorMap({
+            map: 'world_en',
+            backgroundColor: 'transparent',
+            color: '#E5E3E5',
+            hoverOpacity: 0.7,
+            selectedColor: selectedColor,
+            enableZoom: true,
+            showTooltip: true,
+            values: sales_data,
+            scaleColors: [ color, darkColor],
+            normalizeFunction: 'linear'
+        });
+    }
+
+    drawSalesMap();
+
+    $(document).on("themechange", function(){
+       drawSalesMap();
+    });
+});
+$(function() {
+
+	$('.actions-list > li').on('click', '.check', function(e){
+		e.preventDefault();
+
+		$(this).parents('.tasks-item')
+		.find('.checkbox')
+		.prop("checked",  true);
+
+		removeActionList();
 	});
 
-	$('.form-control').blur(function() {
-		$(this).siblings('.input-group-addon').removeClass('focus');
-	});
 });
 $(function(){
 
@@ -1144,55 +1189,20 @@ $(function() {
     });
 
 });
+//LoginForm validation
 $(function() {
+	if (!$('.form-control').length) {
+        return false;
+    }
 
-	$(".wyswyg").each(function() {
-
-		var $toolbar = $(this).find(".toolbar");
-		var $editor = $(this).find(".editor");
-
-
-		var editor = new Quill($editor.get(0), {
-			theme: 'snow'
-		});
-
-		editor.addModule('toolbar', {
-			container: $toolbar.get(0)     // Selector for toolbar container
-		});
-
-
-
+    $('.form-control').focus(function() {
+		$(this).siblings('.input-group-addon').addClass('focus');
 	});
-	
+
+	$('.form-control').blur(function() {
+		$(this).siblings('.input-group-addon').removeClass('focus');
+	});
 });
-$(function () {
-
-	$('#sidebar-menu, #customize-menu').metisMenu({
-		activeClass: 'open'
-	});
-
-
-	$('#sidebar-collapse-btn').on('click', function(event){
-		event.preventDefault();
-		
-		$("#app").toggleClass("sidebar-open");
-	});
-
-	$("#sidebar-overlay").on('click', function() {
-		$("#app").removeClass("sidebar-open");
-	});
-	
-});
-$(function() {
-	$('.nav-profile > li > a').on('click', function() {
-		var $el = $(this).next();
-
-		animate({
-			name: 'flipInX',
-			selector: $el
-		});
-	});
-})
 var modalMedia = {
 	$el: $("#modal-media"),
 	result: {},
@@ -1216,6 +1226,21 @@ var modalMedia = {
 		}
 	}
 };
+// Animating dropdowns is temporary disabled
+// Please feel free to send a pull request :)
+
+// $(function() {
+// 	$('.nav-profile > li > a').on('click', function() {
+// 		var $el = $(this).next();
+
+
+// 		animate({
+// 			name: 'flipInX',
+// 			selector: $el
+// 		});
+// 	});
+// })
+
 $(function () {
 
 	// Local storage settings
